@@ -59,7 +59,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+	
+   <dependency>
+     <groupId>com.github.martinpg2001</groupId>
+     <artifactId>xcase</artifactId>
+     <version>1.0.39</version>
+   </dependency>
+ </dependencies>
 
 	<build>
 		<plugins>
