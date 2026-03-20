@@ -1,4 +1,5 @@
 package com.example.demo.Controllers;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,57 +21,62 @@ import com.example.demo.Models.User;
 import com.example.demo.Models.UserType;
 
 @RestController
-
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
+
     @Autowired
-	UserService userService;
-    
+    UserService userService;
+
     // Get All Users
     @GetMapping("/user")
     public List<User> getUsers() {
         return userService.getUsers();
     }
-   
 
-    //Post a User
+    // Post a User
     @PostMapping("/user")
     public ResponseEntity<Optional<User>> addUser(@RequestBody UserPostDTO newUserDTO) {
-    	
-    	if (newUserDTO.getName()==null || 
-    		newUserDTO.getEmail()==null ||
-    		newUserDTO.getPassword()==null ||
-    		newUserDTO.getUserType() == UserType.NONE) {
+
+        if (newUserDTO.getName() == null ||
+            newUserDTO.getEmail() == null ||
+            newUserDTO.getPassword() == null ||
+            newUserDTO.getUserType() == UserType.NONE) {
             return new ResponseEntity<>(Optional.ofNullable(null), HttpStatus.BAD_REQUEST);
         }
-    	
-    	User newUser = new User(newUserDTO.getName(), newUserDTO.getEmail(),
-    			newUserDTO.getPassword(), newUserDTO.getUserType());
-    	userService.addUser(newUser);
-    	return new ResponseEntity<>(Optional.ofNullable(newUser),HttpStatus.CREATED);
 
+        long start = System.currentTimeMillis(); // ⬅️ START TIMER
+
+        User newUser = new User(
+                newUserDTO.getName(),
+                newUserDTO.getEmail(),
+                newUserDTO.getPassword(),
+                newUserDTO.getUserType()
+        );
+
+        userService.addUser(newUser);
+
+        long end = System.currentTimeMillis(); // ⬅️ END TIMER
+        System.out.println("Processing time: " + (end - start) + " ms");
+
+        return new ResponseEntity<>(Optional.ofNullable(newUser), HttpStatus.CREATED);
     }
 
-    
-    //Get User by ID
+    // Get User by ID
     @GetMapping("/user/{id}")
     public Optional<User> getUserById(@PathVariable(value = "id") long Id) {
         return userService.findByID(Id);
     }
-    
-    
-    //Delete a User by ID
+
+    // Delete a User by ID
     @DeleteMapping("/user/{id}")
     public String deleteUser(@PathVariable(value = "id") long Id) {
         userService.deleteUser(Id);
-        return "User Deleted"; 
+        return "User Deleted";
     }
-    
-    //Get User by Email
+
+    // Get User by Email
     @GetMapping("/user/findByEmail")
     public Optional<User> getUserByEmail(@RequestParam String email) {
-    	return Optional.ofNullable(userService.findByEmail(email));
+        return Optional.ofNullable(userService.findByEmail(email));
     }
-	}
-
- 
+}
