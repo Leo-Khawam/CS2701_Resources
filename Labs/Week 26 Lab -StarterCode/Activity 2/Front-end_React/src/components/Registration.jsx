@@ -1,8 +1,8 @@
-import React, {useRef} from "react";
-import {Link} from "react-router-dom";
+import React, { useRef } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
-export default function Registration(){
+export default function Registration() {
 
     const name = useRef();
     const email = useRef();
@@ -22,102 +22,108 @@ export default function Registration(){
             email.current.validity.valueMissing ||
             password.current.validity.valueMissing ||
             repPassword.current.validity.valueMissing
-        ){
+        ) {
             alert("Please fill in all text fields.");
         }
-        else if (email.current.validity.typeMismatch){
+        else if (email.current.validity.typeMismatch) {
             alert("Invalid e-mail address. Please enter your e-mail again.");
         }
-        else if (password.current.validity.tooShort){
+        else if (password.current.validity.tooShort) {
             alert("Password is too short. Please select another password");
         }
-        else if (password.current.value !== repPassword.current.value){
+        else if (password.current.value !== repPassword.current.value) {
             alert("Passwords do not match. Please retry");
         }
-        else if (!buyer.current.checked && !seller.current.checked){
-            alert("Please check at least one checkbox to select being a seller or a buyer in the system.")
+        else if (!buyer.current.checked && !seller.current.checked) {
+            alert("Please check at least one checkbox to select being a seller or a buyer in the system.");
         }
-        else if (tos.current.validity.valueMissing){
-            alert("Please agree to the Terms and Conditions, and Privacy Policy.")
+        else if (tos.current.validity.valueMissing) {
+            alert("Please agree to the Terms and Conditions, and Privacy Policy.");
         }
-        else{
+        else {
             formValid = true;
         }
 
         return formValid;
-    }
-/*you need to modify the code for handleSubmit in Registration.jsx, so that it
-can make an Axios post request to the ‘http://localhost:8080/user’ endpoint. Refer to Week
-9 lecture and lab for information on Axios.
-*/
-    const handleSubmit = (event) => {
+    };
+
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        
-        if(validateForm()){
-            axios.post('/user',{
+
+        if (validateForm()) {
+
+            const requestData = {
                 name: name.current.value,
                 email: email.current.value,
                 password: password.current.value,
                 buyer: buyer.current.checked,
                 seller: seller.current.checked
-            })
-            .then(response=>{
-                console.log(response);
-                if (response.status === 201){
-                    alert("Registered successfully.")
+            };
+
+            try {
+                const response = await axios.post(
+                    "http://localhost:8080/user",
+                    requestData,
+                    { headers: { "Content-Type": "application/json" } }
+                );
+
+                console.log("Backend response:", response);
+
+                if (response.status === 201 || response.status === 200) {
+                    alert("Registered successfully.");
                 }
-            })
-            .then(()=>{
-                name.current.value="";
-                email.current.value="";
-                password.current.value="";
-                repPassword.current.value="";
-                buyer.current.checked=false;
-                seller.current.checked=false;
-                tos.current.checked=false;
-            })
-            .catch(error=>{
-                console.log(error);
-            })
+
+                // Reset form
+                name.current.value = "";
+                email.current.value = "";
+                password.current.value = "";
+                repPassword.current.value = "";
+                buyer.current.checked = false;
+                seller.current.checked = false;
+                tos.current.checked = false;
+
+            } catch (error) {
+                console.error("Error during registration:", error);
+                alert("Registration failed. Check console for details.");
+            }
         }
-    }
+    };
 
     return (
         <form className="registration" noValidate ref={componentRef}>
 
             <label className="labelText">Name: </label>
-            <input type="text" className="inputText" ref={name} name="name" required autoComplete="off"/>
-            <br/><br/>
+            <input type="text" className="inputText" ref={name} name="name" required autoComplete="off" />
+            <br /><br />
 
             <label className="labelText">Email:</label>
-            <input type="email" className="inputText" ref={email} name="email" required autoComplete="off"/>
-            <br/><br/>
+            <input type="email" className="inputText" ref={email} name="email" required autoComplete="off" />
+            <br /><br />
 
             <label className="labelText">Password:</label>
-            <input type="password" className="inputText" ref={password} name="password" required minLength="8"/>
-            <br/><br/>
+            <input type="password" className="inputText" ref={password} name="password" required minLength="8" />
+            <br /><br />
 
             <label className="labelText">Re-type password:</label>
-            <input type="password" className="inputText" ref={repPassword} name="repPassword" required/>
-            <br/><br/>
+            <input type="password" className="inputText" ref={repPassword} name="repPassword" required />
+            <br /><br />
 
-            <input type="checkbox" ref={buyer} name="buyer" value="buyer"/>
+            <input type="checkbox" ref={buyer} name="buyer" value="buyer" />
             <label>I want to buy produce directly from allotment owners.</label>
-            <br/>
+            <br />
 
-            <input type="checkbox" ref={seller} name="seller" value="seller"/>
+            <input type="checkbox" ref={seller} name="seller" value="seller" />
             <label>I want to sell produce from my allotment.</label>
-            <br/><br/>
+            <br /><br />
 
-            <input type="checkbox" ref={tos} name="tos" value="tos" required/>
+            <input type="checkbox" ref={tos} name="tos" value="tos" required />
             <label>I agree to the Terms of Use and Privacy Policy.</label>
-            <br/><br/>
+            <br /><br />
 
             <button type="button" onClick={handleSubmit}>Submit</button>
 
-            <br/><br/>
-
+            <br /><br />
 
         </form>
-    )
+    );
 }
